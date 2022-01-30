@@ -14,12 +14,8 @@ RUN pip install --upgrade pip  &&\
     poetry install --no-interaction &&\
     poetry shell
 
-ADD entrypoint.sh /usr/src/app/entrypoint.sh
+COPY . /usr/src/api/
 
-RUN chmod a+x /usr/src/app/entrypoint.sh
+RUN chmod +x entrypoint.sh
 
-COPY . .
-
-RUN pwd && ls -la
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000",  "--reload"]
+CMD ["/usr/src/api/entrypoint.sh"]
