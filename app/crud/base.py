@@ -31,27 +31,35 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         """
         self.model = model
 
-    def get(self, session: AsyncSession, pk: Any) -> Optional[ModelType]:
-        return session.query(self.model).filter(self.model.id == pk).first()
+    # ok
+    async def get(
+            self, session: AsyncSession, pk: Any
+    ) -> Optional[ModelType]:
+        async with session.begin():
+            instance = await session.get(self.model, pk)
+        return instance
 
+    # ok
     async def get_multi(
         self, session: AsyncSession, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-
-        async with session:
+        async with session.begin():
             query = select(self.model).offset(skip).limit(limit)
             result = await session.execute(query)
+        instances = result.scalars().all()
+        return instances
 
-        return result
-
-    def create(self, session: AsyncSession, *, data: CreateSchemaType) -> ModelType:
-        data = jsonable_encoder(data)
-        instance = self.model(data)
-        session.add(instance)
-        session.commit()
-        session.refresh(instance)
+    # ok
+    async def create(
+            self, session: AsyncSession, *, data: CreateSchemaType
+    ) -> ModelType:
+        data = jsonable_encoder(obj=data)
+        async with session.begin():
+            instance = self.model(**data)
+            session.add(instance)
         return instance
 
+    # TODO: rewrite this
     def update(
         self,
         session: AsyncSession,
@@ -72,8 +80,11 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         session.refresh(instance)
         return instance
 
-    def remove(self, session: AsyncSession, *, pk: int) -> ModelType:
-        instance = session.query(self.model).get(pk)
-        session.delete(instance)
-        session.commit()
+    # not working !!!
+    # TODO: validate and correct this
+    async def remove(self, session: AsyncSession, *, pk: int) -> ModelType:
+        async with session.begin():
+            instance = await session.get(self.model, pk)
+            session.delete(instance)
+            session.commit()
         return instance

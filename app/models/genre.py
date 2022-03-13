@@ -9,7 +9,7 @@ from .book import book_genre
 
 
 class Genre(Base):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), unique=True, nullable=False, index=True)
 
     # relationships

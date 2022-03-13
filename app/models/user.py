@@ -18,7 +18,7 @@ user_book = Table(
 
 
 class User(Base):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String, nullable=False)
     person_id = Column(Integer, ForeignKey('person.id'))
