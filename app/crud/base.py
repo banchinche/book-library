@@ -31,7 +31,6 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         """
         self.model = model
 
-    # ok
     async def get(
             self, session: AsyncSession, pk: Any
     ) -> Optional[ModelType]:
@@ -39,7 +38,6 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
             instance = await session.get(self.model, pk)
         return instance
 
-    # ok
     async def get_multi(
         self, session: AsyncSession, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
@@ -49,7 +47,6 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         instances = result.scalars().all()
         return instances
 
-    # ok
     async def create(
             self, session: AsyncSession, *, data: CreateSchemaType
     ) -> ModelType:
@@ -59,8 +56,7 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
             session.add(instance)
         return instance
 
-    # TODO: rewrite this
-    def update(
+    async def update(
         self,
         session: AsyncSession,
         *,
@@ -72,19 +68,20 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
             update_data = data
         else:
             update_data = data.dict(exclude_unset=True)
+
         for field in instance_data:
+            print(getattr(instance, field))
             if field in update_data:
                 setattr(instance, field, update_data[field])
+        for attr in instance_data:
+            print(getattr(instance, attr))
         session.add(instance)
-        session.commit()
-        session.refresh(instance)
+        await session.commit()
+        await session.refresh(instance)
         return instance
 
-    # not working !!!
-    # TODO: validate and correct this
     async def remove(self, session: AsyncSession, *, pk: int) -> ModelType:
         async with session.begin():
             instance = await session.get(self.model, pk)
-            session.delete(instance)
-            session.commit()
+            await session.delete(instance)
         return instance
