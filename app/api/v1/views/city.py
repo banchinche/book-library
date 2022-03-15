@@ -22,7 +22,6 @@ async def get_cities(
     List cities.
     """
     cities = await crud.city.get_multi(session=session, skip=skip, limit=limit)
-    # return list(cities)
     return cities
 
 
@@ -51,7 +50,7 @@ async def update_city(
     """
     city = await crud.city.get(session=session, pk=pk)
     if not city:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="City not found")
     city = await crud.city.update(session=session, instance=city, data=data)
     return city
 
@@ -67,7 +66,7 @@ async def get_city(
     """
     city = await crud.city.get(session=session, pk=pk)
     if not city:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="City not found")
     return city
 
 
@@ -82,6 +81,6 @@ async def delete_city(
     """
     city = await crud.city.get(session=session, pk=pk)
     if not city:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="City not found")
     city = await crud.city.remove(session=session, pk=pk)
     return city

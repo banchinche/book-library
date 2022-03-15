@@ -1,6 +1,12 @@
 from .city import (
     City,
     CityCreate,
-    CityUpdate,
     CityDatabase,
+    CityUpdate,
+)
+from .genre import (
+    Genre,
+    GenreCreate,
+    GenreDatabaseBase,
+    GenreUpdate
 )

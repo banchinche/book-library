@@ -22,7 +22,6 @@ CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
-# TODO: validate queries for every method
 class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         """CRUD object with default methods to Create, Read, Update, Delete (CRUD).
@@ -68,13 +67,9 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
             update_data = data
         else:
             update_data = data.dict(exclude_unset=True)
-
         for field in instance_data:
-            print(getattr(instance, field))
             if field in update_data:
                 setattr(instance, field, update_data[field])
-        for attr in instance_data:
-            print(getattr(instance, attr))
         session.add(instance)
         await session.commit()
         await session.refresh(instance)
