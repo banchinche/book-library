@@ -14,7 +14,7 @@ class Author(Base):
     # relationships
     person = relationship(
         'Person',
-        back_populates='authors'
+        back_populates='author'
     )
     books = relationship(
         'Book',

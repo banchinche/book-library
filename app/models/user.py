@@ -26,7 +26,7 @@ class User(Base):
     # relationships
     person = relationship(
         'Person',
-        back_populates='users'
+        back_populates='user'
     )
     books = relationship(
         'Book',

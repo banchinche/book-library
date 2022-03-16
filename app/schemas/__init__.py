@@ -1,3 +1,9 @@
+from .author import (
+    Author,
+    AuthorCreate,
+    AuthorDatabase,
+    AuthorUpdate,
+)
 from .city import (
     City,
     CityCreate,

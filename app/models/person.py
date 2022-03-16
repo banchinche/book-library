@@ -17,15 +17,17 @@ class Person(Base):
     city_id = Column(Integer, ForeignKey('city.id'))
 
     # relationships
-    authors = relationship(
+    author = relationship(
         'Author',
-        back_populates='person'
+        back_populates='person',
+        uselist=False
     )
     city = relationship(
         'City',
         back_populates='persons'
     )
-    users = relationship(
+    user = relationship(
         'User',
-        back_populates='person'
+        back_populates='person',
+        uselist=False
     )
