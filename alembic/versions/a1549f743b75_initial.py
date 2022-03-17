@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: ca6e70c006bd
+Revision ID: a1549f743b75
 Revises: 
-Create Date: 2022-03-16 07:11:41.039022
+Create Date: 2022-03-16 17:54:47.712320
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ca6e70c006bd'
+revision = 'a1549f743b75'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,7 +30,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_genre_name'), 'genre', ['name'], unique=True)
-    op.create_table('person',
+    op.create_table('author',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('first_name', sa.String(length=100), nullable=False),
     sa.Column('last_name', sa.String(length=100), nullable=False),
@@ -39,18 +39,15 @@ def upgrade():
     sa.ForeignKeyConstraint(['city_id'], ['city.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('author',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('person_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['person_id'], ['person.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('user',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('first_name', sa.String(length=100), nullable=False),
+    sa.Column('last_name', sa.String(length=100), nullable=False),
+    sa.Column('birth_date', sa.Date(), nullable=True),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
-    sa.Column('person_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['person_id'], ['person.id'], ),
+    sa.Column('city_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['city_id'], ['city.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -89,7 +86,6 @@ def downgrade():
     op.drop_table('book')
     op.drop_table('user')
     op.drop_table('author')
-    op.drop_table('person')
     op.drop_index(op.f('ix_genre_name'), table_name='genre')
     op.drop_table('genre')
     op.drop_index(op.f('ix_city_name'), table_name='city')

@@ -41,6 +41,7 @@ services:
 
 networks:
     api:
+        name: api-network
         driver: bridge
 
 volumes:

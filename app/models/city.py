@@ -12,7 +12,11 @@ class City(Base):
     name = Column(String(100), unique=True, nullable=False, index=True)
 
     # relationships
-    persons = relationship(
-        'Person',
+    users = relationship(
+        'User',
+        back_populates='city'
+    )
+    authors = relationship(
+        'Author',
         back_populates='city'
     )

@@ -33,8 +33,8 @@ class AuthorDatabaseBase(AuthorBase):
     birth_date: date
     city_id: int
 
-    # class Config:
-    #     orm_mode = True
+    class Config:
+        orm_mode = True
 
 
 # Properties to return to client

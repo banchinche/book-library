@@ -9,7 +9,6 @@ from typing import (
     Union,
 )
 
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,7 +48,7 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
     async def create(
             self, session: AsyncSession, *, data: CreateSchemaType
     ) -> ModelType:
-        data = jsonable_encoder(obj=data)
+        data = dict(data)
         async with session.begin():
             instance = self.model(**data)
             session.add(instance)
@@ -62,7 +61,7 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         instance: ModelType,
         data: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
-        instance_data = jsonable_encoder(instance)
+        instance_data = dict(data)
         if isinstance(data, dict):
             update_data = data
         else:
