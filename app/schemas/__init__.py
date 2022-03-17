@@ -14,5 +14,11 @@ from .genre import (
     Genre,
     GenreCreate,
     GenreDatabaseBase,
-    GenreUpdate
+    GenreUpdate,
+)
+from .user import (
+    User,
+    UserCreate,
+    UserDatabaseBase,
+    UserUpdate,
 )

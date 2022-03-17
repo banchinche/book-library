@@ -12,7 +12,7 @@ class AuthorBase(BaseModel):
     city_id: Optional[int] = None
 
 
-# Properties to receive on city creation
+# Properties to receive on author creation
 class AuthorCreate(AuthorBase):
     first_name: str
     last_name: str
@@ -20,7 +20,7 @@ class AuthorCreate(AuthorBase):
     city_id: int
 
 
-# Properties to receive on city update
+# Properties to receive on author update
 class AuthorUpdate(AuthorBase):
     ...
 
