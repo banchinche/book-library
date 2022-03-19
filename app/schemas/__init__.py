@@ -4,6 +4,12 @@ from .author import (
     AuthorDatabase,
     AuthorUpdate,
 )
+from .book import (
+    Book,
+    BookCreate,
+    BookDatabase,
+    BookUpdate,
+)
 from .city import (
     City,
     CityCreate,

@@ -40,9 +40,12 @@ class AuthorCRUD(
             update_data = data
         else:
             update_data = data.dict(exclude_unset=True)
+
+
         city = await session.get(City, update_data.get('city_id'))
         if not city:
             raise HTTPException(status_code=404, detail='City not found')
+
         for field in instance_data:
             if field in update_data:
                 setattr(instance, field, update_data[field])
