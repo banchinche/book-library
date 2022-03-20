@@ -25,21 +25,20 @@ async def get_books(
     List books.
     """
     books = await crud.book.get_multi(session=session, skip=skip, limit=limit)
-    print('OUTSIDE CRUD', books)
     return books
 
 
-# @router.post("/", response_model=schemas.User)
-# async def create_user(
+# @router.post("/", response_model=schemas.Book)
+# async def create_book(
 #     *,
 #     session: AsyncSession = Depends(get_session),
-#     data: schemas.UserCreate,
+#     data: schemas.BookCreate,
 # ) -> Any:
 #     """
-#     Create new user.
+#     Create new book.
 #     """
-#     user = await crud.user.create(session=session, data=data)
-#     return user
+#     book = await crud.book.create(session=session, data=data)
+#     return book
 #
 #
 # @router.put("/{id}", response_model=schemas.User)

@@ -44,7 +44,7 @@ class AuthorCRUD(
         else:
             update_data = data.dict(exclude_unset=True)
 
-        await self.validate(session=session, data=data)
+        await self.validate(session=session, data=update_data)
 
         for field in instance_data:
             if field in update_data:

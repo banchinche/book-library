@@ -2,13 +2,13 @@ from typing import (
     List,
 )
 
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import select
 from sqlalchemy.orm import joinedload
 
 from app.crud.base import DataAccessLayerBase
 from app.models.author import Author
-from app.models.book import Book
+from app.models.book import Book, book_genre
 from app.models.genre import Genre
 from app.schemas.book import BookCreate, BookUpdate
 
@@ -36,15 +36,25 @@ class BookCRUD(
         return instances
 
     # TODO: test this
-    async def create(
-            self, session: AsyncSession, *, data: BookCreate
-    ) -> Book:
-        genres = data.genres
-        instance = await super(BookCRUD, self).create(session=session, data=data)
-        await session.execute(instance.genres.insert().values([
-            (instance.id, genre) for genre in genres
-        ]))
-        return instance
+    # async def create(
+    #         self, session: AsyncSession, *, data: BookCreate
+    # ) -> Book:
+    #     genres = data.genres.copy()
+    #     data = dict(data)
+    #     async with session.begin():
+    #         await self.validate(session=session, data=data)
+    #         data.pop('genres')
+    #         instance = Book(**data)  # noqa
+    #         session.add(instance)
+    #         # await session.flush([instance])
+    #     await session.refresh(instance)
+    #         # await session.refresh(instance)
+    #         # await session.execute(
+    #         #     insert(book_genre).values(
+    #         #         [(instance, genre) for genre in genres]
+    #         #     )
+    #         # )
+    #     return instance
 
 
 book = BookCRUD(Book)
