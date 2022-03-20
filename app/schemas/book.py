@@ -10,6 +10,14 @@ from pydantic import (
 )
 
 
+class GenreIdentifier(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
 # Shared properties
 class BookBase(BaseModel):
     title: Optional[str] = None
@@ -46,7 +54,7 @@ class BookDatabaseBase(BookBase):
 
 # Properties to return to client
 class Book(BookDatabaseBase):
-    genres: List[int]
+    genres: List[GenreIdentifier] = list()
 
 
 # Properties stored in DB

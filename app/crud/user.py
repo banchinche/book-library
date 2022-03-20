@@ -6,6 +6,7 @@ from typing import (
 )
 
 from fastapi.exceptions import HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 
@@ -19,15 +20,34 @@ from app.schemas.user import UserCreate, UserUpdate
 class UserCRUD(
     DataAccessLayerBase[User, UserCreate, UserUpdate]
 ):
+    fk_relations = {
+        'city_id': City
+    }
+    m2m_relations = None
+
     async def get_by_email(
             self, session: AsyncSession,
-            email: str
+            email: str,
     ) -> Optional[User]:
-        async with session.begin():
-            query = select(User).filter_by(email=email)
-            result = await session.execute(query)
-            instance = result.fetchone()
+        query = select(User).filter_by(email=email)
+        result = await session.execute(query)
+        instance = result.fetchone()
         return instance
+
+    async def validate(
+            self,
+            session: AsyncSession,
+            data: Dict,
+    ) -> None:
+        await super(UserCRUD, self).validate(session=session, data=data)
+
+        # duplicate user validation
+        duplicate = await self.get_by_email(session=session, email=data.get('email'))
+        if duplicate:
+            raise HTTPException(
+                status_code=404,
+                detail='User with such email already exists'
+            )
 
     async def create(
             self, session: AsyncSession, *, data: UserCreate
@@ -36,22 +56,8 @@ class UserCRUD(
             data.password = get_password_hash(password=data.password)
             data = dict(data)
 
-            # city primary key existing validation
-            city = await session.get(City, data.get('city_id'))
-            if not city:
-                raise HTTPException(status_code=404, detail='City not found')
+            await self.validate(session=session, data=data)
 
-            # duplicate user validation
-            duplicate = await session.execute(
-                select(User).filter_by(email=data.get('email'))
-            )
-            if duplicate.fetchone():
-                raise HTTPException(
-                    status_code=404,
-                    detail='User with such email already exists'
-                )
-
-            # creating user if everything is fine
             instance = User(**data)  # noqa
             session.add(instance)
         return instance
@@ -63,26 +69,13 @@ class UserCRUD(
         instance: User,
         data: Union[User, Dict[str, Any]]
     ) -> User:
-        instance_data = dict(data)
+        instance_data = jsonable_encoder(instance)
         if isinstance(data, dict):
             update_data = data
         else:
             update_data = data.dict(exclude_unset=True)
 
-        # city primary key existing validation
-        city = await session.get(City, update_data.get('city_id'))
-        if not city:
-            raise HTTPException(status_code=404, detail='City not found')
-
-        # duplicate user validation
-        duplicate = await session.execute(
-            select(User).filter_by(email=update_data.get('email'))
-        )
-        if duplicate.fetchone():
-            raise HTTPException(
-                status_code=404,
-                detail='User with such email already exists'
-            )
+        await self.validate(session=session, data=update_data)
 
         # updating user information
         if update_data.get('password'):

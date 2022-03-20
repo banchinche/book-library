@@ -5,12 +5,12 @@ from typing import (
     List,
     Optional,
     Type,
-    TypedDict,
     TypeVar,
     Union,
 )
 
 from fastapi.exceptions import HTTPException
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,8 +24,8 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    fk_relations: Optional[Dict[str, Base]]
-    m2m_relations: Optional[Dict[str, Base]]
+    fk_relations: Optional[Dict[str, Base]] = None
+    m2m_relations: Optional[Dict[str, Base]] = None
 
     def __init__(self, model: Type[ModelType]):
         """CRUD object with default methods to Create, Read, Update, Delete (CRUD).
@@ -66,7 +66,7 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         instance: ModelType,
         data: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
-        instance_data = dict(data)
+        instance_data = jsonable_encoder(instance)
         if isinstance(data, dict):
             update_data = data
         else:
@@ -94,46 +94,47 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
             session: AsyncSession instance, dependency for getting instances
             data: Dictionary with values that come from view
         """
+
+        if not (self.fk_relations or self.m2m_relations):
+            model = self.model.__tablename__.capitalize()
+            raise NotImplementedError(f'{model} has no serialized relations')
+
         errors = dict()
-
-        fk_fields = {
-            key: value
-            for key, value in data.items()
-            if key in self.fk_relations and value
-        }
-        if fk_fields:
-            fk_errors = dict()
-            for key, identity in fk_fields.items():
-                exists = await session.get(self.fk_relations[key], identity)
-                if not exists:
-                    model_name = key.__tablename__.capitalize()
-                    fk_errors[f'{model_name} error'] = \
-                        f'{model_name} with ID {identity} does not exist'
-            if fk_errors:
-                errors['foreign_key_errors'] = fk_errors
-
-        m2m_fields = {
-            key: value
-            for key, value in data.items()
-            if key in self.m2m_relations and value
-        }
-        if m2m_fields:
-            m2m_errors = dict()
-            for key, identities in m2m_fields.items():
-                if len(identities) == 1:
-                    exists = await session.get(self.fk_relations[key], identities[0])
+        if self.fk_relations:
+            fk_fields = {
+                key: value
+                for key, value in data.items()
+                if key in self.fk_relations and value
+            }
+            if fk_fields:
+                fk_errors = dict()
+                for key, identity in fk_fields.items():
+                    exists = await session.get(self.fk_relations[key], identity)
                     if not exists:
-                        model_name = key.__tablename__.capitalize()
-                        m2m_errors[f'{model_name} error'] = \
-                            f'{model_name} with ID {identities[0]} does not exist'
-                else:
+                        model_name = self.fk_relations[key].__tablename__.capitalize()
+                        fk_errors[f'{model_name} error'] = \
+                            f'{model_name} with ID {identity} does not exist'
+                if fk_errors:
+                    errors['foreign_key_errors'] = fk_errors
+        if self.m2m_relations:
+            m2m_fields = {
+                key: value
+                for key, value in data.items()
+                if key in self.m2m_relations and value
+            }
+            if m2m_fields:
+                m2m_errors = dict()
+                for key, identities in m2m_fields.items():
                     for pk in identities:
                         exists = await session.get(self.m2m_relations[key], pk)
                         if not exists:
-                            model_name = key.__tablename__.capitalize()
+                            model_name = self.m2m_relations[key].__tablename__.capitalize()
                             m2m_errors[f'{model_name} error'] = \
                                 f'{model_name} with ID {pk} does not exist'
-            if m2m_errors:
-                errors['many_to_many_errors'] = m2m_errors
+                if m2m_errors:
+                    errors['many_to_many_errors'] = m2m_errors
         if errors:
             raise HTTPException(status_code=404, detail=errors)
+
+    async def validate(self, session: AsyncSession, data: Dict) -> None:
+        await self.check_keys_existence(session=session, data=data)

@@ -4,7 +4,7 @@ from typing import (
     Union,
 )
 
-from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import DataAccessLayerBase
@@ -16,14 +16,17 @@ from app.schemas.author import AuthorCreate, AuthorUpdate
 class AuthorCRUD(
     DataAccessLayerBase[Author, AuthorCreate, AuthorUpdate]
 ):
+    fk_relations = {
+        'city_id': City
+    }
+    m2m_relations = None
+
     async def create(
             self, session: AsyncSession, *, data: AuthorCreate
     ) -> Author:
         data = dict(data)
         async with session.begin():
-            city = await session.get(City, data.get('city_id'))
-            if not city:
-                raise HTTPException(status_code=404, detail='City not found')
+            await self.validate(session=session, data=data)
             instance = self.model(**data)  # noqa
             session.add(instance)
         return instance
@@ -35,16 +38,13 @@ class AuthorCRUD(
         instance: Author,
         data: Union[Author, Dict[str, Any]]
     ) -> Author:
-        instance_data = dict(data)
+        instance_data = jsonable_encoder(instance)
         if isinstance(data, dict):
             update_data = data
         else:
             update_data = data.dict(exclude_unset=True)
 
-
-        city = await session.get(City, update_data.get('city_id'))
-        if not city:
-            raise HTTPException(status_code=404, detail='City not found')
+        await self.validate(session=session, data=data)
 
         for field in instance_data:
             if field in update_data:
