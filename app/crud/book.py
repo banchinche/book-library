@@ -11,6 +11,7 @@ from app.models.author import Author
 from app.models.book import Book, book_genre
 from app.models.genre import Genre
 from app.schemas.book import BookCreate, BookUpdate
+from app.dependencies.session import get_session
 
 
 class BookCRUD(
@@ -36,25 +37,31 @@ class BookCRUD(
         return instances
 
     # TODO: test this
-    # async def create(
-    #         self, session: AsyncSession, *, data: BookCreate
-    # ) -> Book:
-    #     genres = data.genres.copy()
-    #     data = dict(data)
-    #     async with session.begin():
-    #         await self.validate(session=session, data=data)
-    #         data.pop('genres')
-    #         instance = Book(**data)  # noqa
-    #         session.add(instance)
-    #         # await session.flush([instance])
-    #     await session.refresh(instance)
-    #         # await session.refresh(instance)
-    #         # await session.execute(
-    #         #     insert(book_genre).values(
-    #         #         [(instance, genre) for genre in genres]
-    #         #     )
-    #         # )
-    #     return instance
+    async def create(
+            self, session: AsyncSession, *, data: BookCreate
+    ) -> Book:
+        async with session.begin():
+            genres = data.genres.copy()
+            data = dict(data)
+            await self.validate(session=session, data=data)
+            data.pop('genres')
+            instance = Book(**data)  # noqa
+            session.add(instance)
+        await session.refresh(instance)
+        await session.execute(
+            insert(book_genre).values(
+                [(instance.id, genre) for genre in genres]
+            )
+        )
+        await session.commit()
+        # TODO: fix schema or inserting return value with joined load (research this)
+        result = await session.scalars(
+                select(Book).options(
+                    joinedload(Book.genres)
+                ).filter_by(id=instance.id)
+            )
+        instance = result.unique().one()
+        return instance
 
 
 book = BookCRUD(Book)

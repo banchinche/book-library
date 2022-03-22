@@ -28,19 +28,20 @@ async def get_books(
     return books
 
 
-# @router.post("/", response_model=schemas.Book)
-# async def create_book(
-#     *,
-#     session: AsyncSession = Depends(get_session),
-#     data: schemas.BookCreate,
-# ) -> Any:
-#     """
-#     Create new book.
-#     """
-#     book = await crud.book.create(session=session, data=data)
-#     return book
-#
-#
+@router.post("/", response_model=schemas.Book)
+async def create_book(
+    *,
+    session: AsyncSession = Depends(get_session),
+    data: schemas.BookCreate,
+) -> Any:
+    """
+    Create new book.
+    """
+
+    book = await crud.book.create(session=session, data=data)
+    return book
+
+
 # @router.put("/{id}", response_model=schemas.User)
 # async def update_user(
 #     *,
