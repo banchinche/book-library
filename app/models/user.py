@@ -1,12 +1,12 @@
 from sqlalchemy import (
     Column,
     ForeignKey,
-    Integer,
     String,
     Table,
 )
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
+from .mixins import PersonMixin
 
 
 user_book = Table(
@@ -17,17 +17,11 @@ user_book = Table(
 )
 
 
-class User(Base):
-    id = Column(Integer, primary_key=True)
+class User(PersonMixin, Base):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String, nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
 
     # relationships
-    person = relationship(
-        'Person',
-        back_populates='users'
-    )
     books = relationship(
         'Book',
         secondary=user_book,

@@ -14,12 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    ALEMBIC_URI: str
-
-    @classmethod
-    def database_uri(cls) -> Optional[str]:
-        return f'postgresql+asyncpg://{cls.POSTGRES_USER}:{cls.POSTGRES_PASSWORD}' \
-               f'@{cls.POSTGRES_SERVER}:{cls.POSTGRES_PORT}/{cls.POSTGRES_DB}'
+    DATABASE_URI: str
 
     # MAIL AGENT
     SMTP_TLS: bool = True

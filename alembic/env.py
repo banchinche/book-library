@@ -1,12 +1,13 @@
 import asyncio
-from app.core.config import settings
-from app.db.base import Base
-from app import models
-from logging.config import fileConfig
-
-from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
+from logging.config import fileConfig
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from app import models  # noqa
+from app.core.config import settings
+from app.db.base import Base
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,7 +28,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-database_url = settings.ALEMBIC_URI
+database_url = settings.DATABASE_URI
 
 
 def run_migrations_offline():

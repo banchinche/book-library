@@ -9,12 +9,13 @@ from .book import book_genre
 
 
 class Genre(Base):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), unique=True, nullable=False, index=True)
 
     # relationships
     books = relationship(
         'Book',
         secondary=book_genre,
-        back_populates='genres'
+        back_populates='genres',
+        lazy='joined'
     )

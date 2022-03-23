@@ -20,7 +20,7 @@ book_genre = Table(
 
 
 class Book(Base):
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(100), nullable=False, index=True)
     release_date = Column(Date)
     price = Column(Numeric(precision=10, scale=2, asdecimal=True), nullable=True)
@@ -34,7 +34,8 @@ class Book(Base):
     genres = relationship(
         'Genre',
         secondary=book_genre,
-        back_populates='books'
+        back_populates='books',
+        lazy='joined'
     )
     users = relationship(
         'User',
