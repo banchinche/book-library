@@ -34,7 +34,8 @@ class Book(Base):
     genres = relationship(
         'Genre',
         secondary=book_genre,
-        back_populates='books'
+        back_populates='books',
+        lazy='joined'
     )
     users = relationship(
         'User',

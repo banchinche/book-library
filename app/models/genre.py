@@ -16,5 +16,6 @@ class Genre(Base):
     books = relationship(
         'Book',
         secondary=book_genre,
-        back_populates='genres'
+        back_populates='genres',
+        lazy='joined'
     )
