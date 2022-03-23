@@ -42,21 +42,21 @@ async def create_book(
     return book
 
 
-# @router.put("/{id}", response_model=schemas.User)
-# async def update_user(
-#     *,
-#     session: AsyncSession = Depends(get_session),
-#     pk: int,
-#     data: schemas.UserUpdate,
-# ) -> Any:
-#     """
-#     Update an user.
-#     """
-#     user = await crud.user.get(session=session, pk=pk)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     user = await crud.user.update(session=session, instance=user, data=data)
-#     return user
+@router.put("/{id}", response_model=schemas.Book)
+async def update_book(
+    *,
+    session: AsyncSession = Depends(get_session),
+    pk: int,
+    data: schemas.BookUpdate,
+) -> Any:
+    """
+    Update a book.
+    """
+    book = await crud.book.get(session=session, pk=pk)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    book = await crud.book.update(session=session, instance=book, data=data)
+    return book
 
 
 @router.get("/{id}", response_model=schemas.Book)

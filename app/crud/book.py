@@ -1,11 +1,16 @@
 from typing import (
+    Any,
+    Dict,
     List,
     Optional,
+    Union,
 )
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import (
+    delete,
     insert,
-    select
+    select,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -38,7 +43,7 @@ class BookCRUD(
                     joinedload(Book.genres)
                 ).filter_by(id=pk)
             )
-            instance = result.unique().one()
+            instance = result.unique().first()
         return instance
 
     async def get_multi(
@@ -78,7 +83,7 @@ class BookCRUD(
                             joinedload(Book.genres)
                         ).filter_by(id=instance.id)
                     )
-            instance = result.unique().one()
+            instance = result.unique().first()
         return instance
 
     async def remove(
@@ -87,6 +92,49 @@ class BookCRUD(
         instance = await self.get(session=session, pk=pk)
         async with session.begin():
             await session.delete(instance)
+        return instance
+
+    async def update(
+        self,
+        session: AsyncSession,
+        *,
+        instance: Book,
+        data: Union[BookUpdate, Dict[str, Any]]
+    ) -> Book:
+        instance_data = jsonable_encoder(instance)
+        if isinstance(data, dict):
+            update_data = data
+        else:
+            update_data = data.dict(exclude_unset=True)
+
+        await self.validate(session=session, data=update_data)
+        genres = update_data.pop('genres')
+        for field in instance_data:
+            if field in update_data:
+                setattr(instance, field, update_data[field])
+        await session.commit()
+        await session.refresh(instance)
+        if genres != instance.genres:
+            await session.execute(
+                delete(book_genre).where(
+                    book_genre.c.book_id == instance.id, book_genre.c.genre_id not in genres
+                )
+            )
+            await session.commit()
+            await session.execute(
+                insert(book_genre).values(
+                    [(instance.id, genre) for genre in genres if genre not in instance.genres]
+                )
+            )
+            await session.commit()
+        async with session.begin():
+            await session.refresh(instance)
+            result = await session.scalars(
+                        select(Book).options(
+                            joinedload(Book.genres)
+                        ).filter_by(id=instance.id)
+                    )
+            instance = result.unique().first()
         return instance
 
 
