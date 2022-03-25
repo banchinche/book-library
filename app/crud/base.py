@@ -47,7 +47,7 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         async with session.begin():
             query = select(self.model).offset(skip).limit(limit)
             result = await session.execute(query)
-        instances = result.scalars().all()
+        instances = result.scalars().unique().all()
         return instances
 
     async def create(

@@ -47,14 +47,30 @@ class BookCRUD(
         return instance
 
     async def get_multi(
-        self, session: AsyncSession, *, skip: int = 0, limit: int = 100
+        self, session: AsyncSession, *, genre_name: str = '', skip: int = 0, limit: int = 100
     ) -> List[Book]:
         async with session.begin():
-            scalars = await session.scalars(
-                select(Book).options(
-                    joinedload(Book.genres)
-                ).offset(skip).limit(limit)
-            )
+            if not genre_name:
+                scalars = await session.scalars(
+                    select(Book).options(
+                        joinedload(Book.genres)
+                    ).offset(skip).limit(limit)
+                )
+            else:
+                genre_ids = select(Genre.id).where(
+                    Genre.name.ilike(f'%{genre_name}%')  # noqa
+                )
+                book_ids = select(book_genre.c.book_id).where(
+                    book_genre.c.genre_id.in_(genre_ids)
+                )
+
+                scalars = await session.scalars(
+                    select(Book).options(
+                        joinedload(Book.genres)
+                    ).where(
+                        Book.id.in_(book_ids)  # noqa
+                    ).offset(skip).limit(limit)
+                )
             instances = scalars.unique().all()
         return instances
 
