@@ -34,6 +34,20 @@ class UserCRUD(
         instance = result.fetchone()
         return instance
 
+    async def get_multi(
+        self, session: AsyncSession, *,
+        email: str = '', skip: int = 0, limit: int = 100
+    ) -> User:
+        if email:
+            query = select(User).filter(User.email.ilike(f'%{email}%'))  # noqa
+        else:
+            query = select(User)
+        query = query.offset(skip).limit(limit)
+        async with session.begin():
+            result = await session.execute(query)
+        instances = result.scalars().unique().all()
+        return instances
+
     async def validate(
             self,
             session: AsyncSession,

@@ -18,13 +18,16 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.User])
 async def get_users(
     session: AsyncSession = Depends(get_session),
+    email: str = '',
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
     List users.
     """
-    users = await crud.user.get_multi(session=session, skip=skip, limit=limit)
+    users = await crud.user.get_multi(
+        session=session, email=email, skip=skip, limit=limit
+    )
     return users
 
 
