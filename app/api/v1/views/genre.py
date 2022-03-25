@@ -18,13 +18,14 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Genre])
 async def get_genres(
     session: AsyncSession = Depends(get_session),
+    name: str = '',
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
     List genres.
     """
-    genres = await crud.genre.get_multi(session=session, skip=skip, limit=limit)
+    genres = await crud.genre.get_multi(session=session, name=name, skip=skip, limit=limit)
     return genres
 
 

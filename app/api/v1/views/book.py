@@ -18,6 +18,7 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Book])
 async def get_books(
     session: AsyncSession = Depends(get_session),
+    title: str = '',
     genre_name: str = '',
     skip: int = 0,
     limit: int = 100,
@@ -26,7 +27,7 @@ async def get_books(
     List books.
     """
     books = await crud.book.get_multi(
-        session=session, genre_name=genre_name, skip=skip, limit=limit
+        session=session, title=title, genre_name=genre_name, skip=skip, limit=limit
     )
     return books
 
