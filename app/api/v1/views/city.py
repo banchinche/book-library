@@ -18,13 +18,14 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.City])
 async def get_cities(
     session: AsyncSession = Depends(get_session),
+    name: str = '',
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
     List cities.
     """
-    cities = await crud.city.get_multi(session=session, skip=skip, limit=limit)
+    cities = await crud.city.get_multi(session=session, name=name, skip=skip, limit=limit)
     return cities
 
 

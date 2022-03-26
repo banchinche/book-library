@@ -18,13 +18,16 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Author])
 async def get_authors(
     session: AsyncSession = Depends(get_session),
+    last_name: str = '',
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
     List authors.
     """
-    authors = await crud.author.get_multi(session=session, skip=skip, limit=limit)
+    authors = await crud.author.get_multi(
+        session=session, last_name=last_name, skip=skip, limit=limit
+    )
     return authors
 
 

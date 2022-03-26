@@ -5,6 +5,7 @@ from typing import (
 )
 
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import DataAccessLayerBase
@@ -20,6 +21,20 @@ class AuthorCRUD(
         'city_id': City
     }
     m2m_relations = None
+
+    async def get_multi(
+        self, session: AsyncSession, *,
+        last_name: str = '', skip: int = 0, limit: int = 100
+    ) -> Author:
+        if last_name:
+            query = select(Author).filter(Author.last_name.ilike(f'%{last_name}%'))  # noqa
+        else:
+            query = select(Author)
+        query = query.offset(skip).limit(limit)
+        async with session.begin():
+            result = await session.execute(query)
+        instances = result.scalars().unique().all()
+        return instances
 
     async def create(
             self, session: AsyncSession, *, data: AuthorCreate

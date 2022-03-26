@@ -42,12 +42,16 @@ class DataAccessLayerBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]
         return instance
 
     async def get_multi(
-        self, session: AsyncSession, *, skip: int = 0, limit: int = 100
+        self, session: AsyncSession, *, name: str = '', skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
+        if name:
+            query = select(self.model).filter(self.model.name.ilike(f'%{name}%'))
+        else:
+            query = select(self.model)
+        query = query.offset(skip).limit(limit)
         async with session.begin():
-            query = select(self.model).offset(skip).limit(limit)
             result = await session.execute(query)
-        instances = result.scalars().all()
+        instances = result.scalars().unique().all()
         return instances
 
     async def create(
