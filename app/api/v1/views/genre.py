@@ -10,12 +10,15 @@ from app import (
     crud,
     schemas,
 )
-from app.dependencies.session import get_session
+from app.dependencies import (
+    get_session,
+    JWTBearer,
+)
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Genre])
+@router.get("/", response_model=List[schemas.Genre], dependencies=[Depends(JWTBearer())])
 async def get_genres(
     session: AsyncSession = Depends(get_session),
     name: str = '',
@@ -29,7 +32,7 @@ async def get_genres(
     return genres
 
 
-@router.post("/", response_model=schemas.Genre)
+@router.post("/", response_model=schemas.Genre, dependencies=[Depends(JWTBearer())])
 async def create_genre(
     *,
     session: AsyncSession = Depends(get_session),
@@ -42,7 +45,7 @@ async def create_genre(
     return genre
 
 
-@router.put("/{id}", response_model=schemas.Genre)
+@router.put("/{id}", response_model=schemas.Genre, dependencies=[Depends(JWTBearer())])
 async def update_genre(
     *,
     session: AsyncSession = Depends(get_session),
@@ -59,7 +62,7 @@ async def update_genre(
     return genre
 
 
-@router.get("/{id}", response_model=schemas.Genre)
+@router.get("/{id}", response_model=schemas.Genre, dependencies=[Depends(JWTBearer())])
 async def get_genre(
     *,
     session: AsyncSession = Depends(get_session),
@@ -74,7 +77,7 @@ async def get_genre(
     return genre
 
 
-@router.delete("/{id}", response_model=schemas.Genre)
+@router.delete("/{id}", response_model=schemas.Genre, dependencies=[Depends(JWTBearer())])
 async def delete_genre(
     *,
     session: AsyncSession = Depends(get_session),

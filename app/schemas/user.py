@@ -47,3 +47,12 @@ class User(UserDatabaseBase):
 # Properties stored in DB
 class UserDatabase(UserDatabaseBase):
     password: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str

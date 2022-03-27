@@ -4,6 +4,7 @@ from pydantic import AnyHttpUrl, BaseSettings, EmailStr
 
 
 class Settings(BaseSettings):
+    # GENERAL
     API_V1: str = '/api/v1'
     APP_NAME: str
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -34,6 +35,8 @@ class Settings(BaseSettings):
     MAIN_SUPERUSER_PASSWORD: str
 
     # JWT
+    JWT_ALGORITHM: str = 'HS256'
+    JWT_SECRET: str
     ACCESS_TOKEN_LIFETIME_MINUTES: int = 5
     REFRESH_TOKEN_LIFETIME_MINUTES: int = 60 * 24
 
