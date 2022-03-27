@@ -10,12 +10,16 @@ from app import (
     crud,
     schemas,
 )
-from app.dependencies.session import get_session
+from app.dependencies import (
+    get_session,
+    JWTBearer,
+)
+
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Author])
+@router.get("/", response_model=List[schemas.Author], dependencies=[Depends(JWTBearer())])
 async def get_authors(
     session: AsyncSession = Depends(get_session),
     last_name: str = '',
@@ -31,7 +35,7 @@ async def get_authors(
     return authors
 
 
-@router.post("/", response_model=schemas.Author)
+@router.post("/", response_model=schemas.Author, dependencies=[Depends(JWTBearer())])
 async def create_author(
     *,
     session: AsyncSession = Depends(get_session),
@@ -44,7 +48,7 @@ async def create_author(
     return author
 
 
-@router.put("/{id}", response_model=schemas.Author)
+@router.put("/{id}", response_model=schemas.Author, dependencies=[Depends(JWTBearer())])
 async def update_author(
     *,
     session: AsyncSession = Depends(get_session),
@@ -61,7 +65,7 @@ async def update_author(
     return author
 
 
-@router.get("/{id}", response_model=schemas.Author)
+@router.get("/{id}", response_model=schemas.Author, dependencies=[Depends(JWTBearer())])
 async def get_author(
     *,
     session: AsyncSession = Depends(get_session),
@@ -76,7 +80,7 @@ async def get_author(
     return author
 
 
-@router.delete("/{id}", response_model=schemas.Author)
+@router.delete("/{id}", response_model=schemas.Author, dependencies=[Depends(JWTBearer())])
 async def delete_author(
     *,
     session: AsyncSession = Depends(get_session),

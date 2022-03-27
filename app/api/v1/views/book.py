@@ -10,12 +10,16 @@ from app import (
     crud,
     schemas,
 )
-from app.dependencies.session import get_session
+from app.dependencies import (
+    get_session,
+    JWTBearer,
+)
+
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Book])
+@router.get("/", response_model=List[schemas.Book], dependencies=[Depends(JWTBearer())])
 async def get_books(
     session: AsyncSession = Depends(get_session),
     title: str = '',
@@ -32,7 +36,7 @@ async def get_books(
     return books
 
 
-@router.post("/", response_model=schemas.Book)
+@router.post("/", response_model=schemas.Book, dependencies=[Depends(JWTBearer())])
 async def create_book(
     *,
     session: AsyncSession = Depends(get_session),
@@ -46,7 +50,7 @@ async def create_book(
     return book
 
 
-@router.put("/{id}", response_model=schemas.Book)
+@router.put("/{id}", response_model=schemas.Book, dependencies=[Depends(JWTBearer())])
 async def update_book(
     *,
     session: AsyncSession = Depends(get_session),
@@ -63,7 +67,7 @@ async def update_book(
     return book
 
 
-@router.get("/{id}", response_model=schemas.Book)
+@router.get("/{id}", response_model=schemas.Book, dependencies=[Depends(JWTBearer())])
 async def get_book(
     *,
     session: AsyncSession = Depends(get_session),
@@ -78,7 +82,7 @@ async def get_book(
     return book
 
 
-@router.delete("/{id}", response_model=schemas.Book)
+@router.delete("/{id}", response_model=schemas.Book, dependencies=[Depends(JWTBearer())])
 async def delete_book(
     *,
     session: AsyncSession = Depends(get_session),

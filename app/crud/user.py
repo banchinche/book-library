@@ -10,7 +10,10 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.sql.expression import select
 
-from app.core.security import get_password_hash
+from app.core.security import (
+    get_password_hash,
+    verify_password,
+)
 from app.crud.base import DataAccessLayerBase
 from app.models.city import City
 from app.models.user import User
@@ -25,13 +28,26 @@ class UserCRUD(
     }
     m2m_relations = None
 
+    async def authenticate(
+            self,
+            session: AsyncSession,
+            email: str,
+            password: str
+    ) -> Optional[User]:
+        instance = await self.get_by_email(session=session, email=email)
+        if not instance:
+            return None
+        if not verify_password(password, instance.password):
+            return None
+        return instance
+
     async def get_by_email(
             self, session: AsyncSession,
             email: str,
     ) -> Optional[User]:
         query = select(User).filter_by(email=email)
-        result = await session.execute(query)
-        instance = result.fetchone()
+        result = await session.scalars(query)
+        instance = result.first()
         return instance
 
     async def get_multi(

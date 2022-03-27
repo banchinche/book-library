@@ -10,12 +10,16 @@ from app import (
     crud,
     schemas,
 )
-from app.dependencies.session import get_session
+from app.dependencies import (
+    get_session,
+    JWTBearer,
+)
+
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.City])
+@router.get("/", response_model=List[schemas.City], dependencies=[Depends(JWTBearer())])
 async def get_cities(
     session: AsyncSession = Depends(get_session),
     name: str = '',
@@ -29,7 +33,7 @@ async def get_cities(
     return cities
 
 
-@router.post("/", response_model=schemas.City)
+@router.post("/", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
 async def create_city(
     *,
     session: AsyncSession = Depends(get_session),
@@ -42,7 +46,7 @@ async def create_city(
     return city
 
 
-@router.put("/{id}", response_model=schemas.City)
+@router.put("/{id}", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
 async def update_city(
     *,
     session: AsyncSession = Depends(get_session),
@@ -59,7 +63,7 @@ async def update_city(
     return city
 
 
-@router.get("/{id}", response_model=schemas.City)
+@router.get("/{id}", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
 async def get_city(
     *,
     session: AsyncSession = Depends(get_session),
@@ -74,7 +78,7 @@ async def get_city(
     return city
 
 
-@router.delete("/{id}", response_model=schemas.City)
+@router.delete("/{id}", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
 async def delete_city(
     *,
     session: AsyncSession = Depends(get_session),

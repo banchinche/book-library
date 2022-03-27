@@ -10,12 +10,16 @@ from app import (
     crud,
     schemas,
 )
-from app.dependencies.session import get_session
+from app.dependencies import (
+    get_session,
+    JWTBearer,
+)
+
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
+@router.get("/", response_model=List[schemas.User], dependencies=[Depends(JWTBearer())])
 async def get_users(
     session: AsyncSession = Depends(get_session),
     email: str = '',
@@ -31,20 +35,7 @@ async def get_users(
     return users
 
 
-@router.post("/", response_model=schemas.User)
-async def create_user(
-    *,
-    session: AsyncSession = Depends(get_session),
-    data: schemas.UserCreate,
-) -> Any:
-    """
-    Create new user.
-    """
-    user = await crud.user.create(session=session, data=data)
-    return user
-
-
-@router.put("/{id}", response_model=schemas.User)
+@router.put("/{id}", response_model=schemas.User, dependencies=[Depends(JWTBearer())])
 async def update_user(
     *,
     session: AsyncSession = Depends(get_session),
@@ -61,7 +52,7 @@ async def update_user(
     return user
 
 
-@router.get("/{id}", response_model=schemas.User)
+@router.get("/{id}", response_model=schemas.User, dependencies=[Depends(JWTBearer())])
 async def get_user(
     *,
     session: AsyncSession = Depends(get_session),
@@ -76,7 +67,7 @@ async def get_user(
     return user
 
 
-@router.delete("/{id}", response_model=schemas.User)
+@router.delete("/{id}", response_model=schemas.User, dependencies=[Depends(JWTBearer())])
 async def delete_user(
     *,
     session: AsyncSession = Depends(get_session),

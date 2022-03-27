@@ -23,8 +23,10 @@ from .genre import (
     GenreUpdate,
 )
 from .user import (
+    Token,
     User,
     UserCreate,
     UserDatabaseBase,
+    UserLogin,
     UserUpdate,
 )
