@@ -19,7 +19,7 @@ from app.dependencies import (
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.City], dependencies=[Depends(JWTBearer())])
+@router.get("/", response_model=List[schemas.City])
 async def get_cities(
     session: AsyncSession = Depends(get_session),
     name: str = '',
