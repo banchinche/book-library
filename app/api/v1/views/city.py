@@ -19,7 +19,7 @@ from app.dependencies import (
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.City], dependencies=[Depends(JWTBearer())])
+@router.get("/", response_model=List[schemas.City])
 async def get_cities(
     session: AsyncSession = Depends(get_session),
     name: str = '',
@@ -33,7 +33,7 @@ async def get_cities(
     return cities
 
 
-@router.post("/", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
+@router.post("/", response_model=schemas.City) #, dependencies=[Depends(JWTBearer())])
 async def create_city(
     *,
     session: AsyncSession = Depends(get_session),
