@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+    - "5432:5432"
+    env_file:
+      - ./.env.db
+    networks:
+      - api
+  backend:
+    container_name: backend
+    restart: always
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    volumes:
+      - .:/usr/src/api/
+    depends_on:
+      - db
+    networks:
+      - api
+
+networks:
+    api:
+        name: api-network
+        driver: bridge
+
+volumes:
+  postgres_data:
+

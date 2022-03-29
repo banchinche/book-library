@@ -1,0 +1,33 @@
+name: Lint & Test
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  docker-compose:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout & create env-files
+        uses: actions/checkout@v2
+        run: |
+          chmod +x ./create_env.sh
+          ./create_env.sh
+        shell: bash
+      - name: Create containers
+        run: docker-compose -f "docker-compose-ci.yml" up -d --build
+      - name: Run lint
+        run: docker-compose exec backend flake8 .
+      - name: Run tests
+        run: docker-compose exec backend pytest .
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose-ci.yml" down
