@@ -18,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Looking for project root and shell script
+        run: |
+          pwd
+          ls -la
       - name: Create env-files
         run: |
           chmod +x ./create_env.sh
