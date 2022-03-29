@@ -2,7 +2,7 @@
 Testing just failure situations
 """
 import json
-import pytest
+import pytest  # noqa
 
 from app.core.config import settings
 

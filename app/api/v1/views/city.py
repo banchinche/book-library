@@ -33,7 +33,7 @@ async def get_cities(
     return cities
 
 
-@router.post("/", response_model=schemas.City, dependencies=[Depends(JWTBearer())])
+@router.post("/", response_model=schemas.City) #, dependencies=[Depends(JWTBearer())])
 async def create_city(
     *,
     session: AsyncSession = Depends(get_session),
