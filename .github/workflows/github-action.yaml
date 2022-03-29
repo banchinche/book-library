@@ -24,8 +24,8 @@ jobs:
           ls -la
       - name: Create env-files
         run: |
-          chmod +x create_env.sh
-          ./create_env.sh
+          chmod +x create-env.sh
+          ./create-env.sh
         shell: bash
       - name: Create containers
         run: docker-compose -f "docker-compose-ci.yml" up -d --build
