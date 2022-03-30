@@ -11,5 +11,6 @@ then
     echo "Database started"
 fi
 
+sleep 30
 alembic upgrade head
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
