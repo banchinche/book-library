@@ -40,7 +40,7 @@ jobs:
       - name: Run lint
         run: docker-compose -f "docker-compose-ci.yml" exec -T backend flake8 .
       - name: Run tests
-        run: docker-compose -f "docker-compose-ci.yml" exec -T backend "pytest ."
+        run: docker-compose -f "docker-compose-ci.yml" exec -T backend alembic upgrade head && pytest .
       - name: Stop containers
         if: always()
         run: docker-compose -f "docker-compose-ci.yml" down
