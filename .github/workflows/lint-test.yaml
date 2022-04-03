@@ -39,6 +39,7 @@ jobs:
         run: docker-compose -f "docker-compose-ci.yml" up -d --build
       - name: Run lint
         run: docker-compose -f "docker-compose-ci.yml" exec -T backend flake8 .
+      # TODO: remove this step when problem with applying alembic migrations will be resolved
       - name: Apply migrations
         run: docker-compose -f "docker-compose-ci.yml" exec -T backend alembic upgrade head
       - name: Run tests
