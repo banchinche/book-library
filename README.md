@@ -16,4 +16,4 @@ and learning how to use FastAPI web-framework with SQLAlchemy (async).
 
 For course work I have prepared various UML-diagrams, 
 you can find them 
-[here](https://github.com/banchinche/book-library/tree/develop/diagrams).
+[here](https://github.com/banchinche/book-library/tree/master/diagrams).

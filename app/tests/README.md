@@ -1,4 +1,4 @@
-#Testing
+# Testing
 
 **Auth**
 
@@ -9,4 +9,4 @@
 
 City views were stripped of protection in order to 
 demonstrate CRUD for models.
- - all CRUD operations
+ - GET-POST requests
