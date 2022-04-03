@@ -1,32 +1,21 @@
 import secrets
-from typing import Any, Dict, List, Optional, Union
-from pydantic import AnyHttpUrl, BaseSettings, EmailStr, PostgresDsn, validator
+from typing import List, Optional
+from pydantic import AnyHttpUrl, BaseSettings, EmailStr
 
 
 class Settings(BaseSettings):
+    # GENERAL
     API_V1: str = '/api/v1'
     APP_NAME: str
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
     # DATABASE
     POSTGRES_SERVER: str
+    POSTGRES_PORT: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DATABASE: str
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
-
-    @classmethod
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        )
+    POSTGRES_DB: str
+    DATABASE_URI: str
 
     # MAIL AGENT
     SMTP_TLS: bool = True
@@ -46,6 +35,8 @@ class Settings(BaseSettings):
     MAIN_SUPERUSER_PASSWORD: str
 
     # JWT
+    JWT_ALGORITHM: str = 'HS256'
+    JWT_SECRET: str
     ACCESS_TOKEN_LIFETIME_MINUTES: int = 5
     REFRESH_TOKEN_LIFETIME_MINUTES: int = 60 * 24
 

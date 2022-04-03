@@ -1,0 +1,49 @@
+name: Lint & Test
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  Lint-test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create env-files
+        env:
+          APP_NAME: ${{ secrets.APP_NAME }}
+          MAIN_SUPERUSER: ${{ secrets.MAIN_SUPERUSER }}
+          MAIN_SUPERUSER_PASSWORD: ${{ secrets.MAIN_SUPERUSER_PASSWORD }}
+          POSTGRES_SERVER: ${{ secrets.POSTGRES_SERVER }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URI: ${{ secrets.DATABASE_URI }}
+          JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          chmod +x create-env.sh
+          ./create-env.sh
+        shell: bash
+      - name: Create containers
+        run: docker-compose -f "docker-compose-ci.yml" up -d --build
+      - name: Run lint
+        run: docker-compose -f "docker-compose-ci.yml" exec -T backend flake8 .
+      # TODO: remove this step when problem with applying alembic migrations will be resolved
+      - name: Apply migrations
+        run: docker-compose -f "docker-compose-ci.yml" exec -T backend alembic upgrade head
+      - name: Run tests
+        run: docker-compose -f "docker-compose-ci.yml" exec -T backend pytest .
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose-ci.yml" down
