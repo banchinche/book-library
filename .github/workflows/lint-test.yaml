@@ -36,12 +36,12 @@ jobs:
           ./create-env.sh
         shell: bash
       - name: Create containers
-        run: docker-compose -f "docker-compose-ci.yml" up -d --build
+        run: docker-compose -f "docker-compose-ci.yml" up --build
       - name: Run lint
         run: docker-compose -f "docker-compose-ci.yml" exec -T backend flake8 .
       # TODO: remove this step when problem with applying alembic migrations will be resolved
-      - name: Apply migrations
-        run: docker-compose -f "docker-compose-ci.yml" exec -T backend alembic upgrade head
+#       - name: Apply migrations
+#         run: docker-compose -f "docker-compose-ci.yml" exec -T backend alembic upgrade head
       - name: Run tests
         run: docker-compose -f "docker-compose-ci.yml" exec -T backend pytest .
       - name: Stop containers
