@@ -18,6 +18,10 @@
 
 ![Packages diagram](packages/packagesDiagram.png)
 
+**Deployment diagram**
+
+![Deployment diagram](deployment/deploymentDiagram.png)
+
 # Behavioral diagrams
 
 **Use Case diagram**
