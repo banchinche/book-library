@@ -27,3 +27,7 @@
 **Use Case diagram**
 
 ![Use case diagram](useCases/useCases.png)
+
+**State diagram**
+
+![State diagram](state/stateDiagram.png)
