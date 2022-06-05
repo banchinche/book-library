@@ -28,6 +28,6 @@
 
 ![Use case diagram](useCases/useCases.png)
 
-**State diagram**
+**Activity diagram**
 
-![State diagram](state/stateDiagram.png)
+![Activity diagram](activity/activityDiagram.png)
