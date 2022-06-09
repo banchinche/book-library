@@ -32,6 +32,6 @@
 
 ![Activity diagram](activity/activityDiagram.png)
 
-**Sequence diagram (for example City CRUD operations)**
+**Sequence diagram (for example Genre CRUD operations)**
 
-![Sequence diagram](sequence/sequenceDiagramCityCRUD.png)
+![Sequence diagram](sequence/sequenceDiagramGenreCRUD.png)
