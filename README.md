@@ -5,6 +5,18 @@ This project is an example of the library API implementation.
 Also, this topic was chosen for course work **"API for library book management"**
 and learning how to use FastAPI web-framework with SQLAlchemy (async).
 
+# How to use it
+
+1. Clone repo
+```
+git clone https://github.com/banchinche/book-library.git
+```
+2. Run docker-compose services
+
+```
+docker-compose up
+```
+
 # Tech-stack
 - FastAPI
 - PostgreSQL
